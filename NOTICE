@@ -1,0 +1,5 @@
+Dropwizard Metrics Influx
+Copyright 2026 Edward Capriolo
+
+This product includes code derived from davidB/metrics-influxdb,
+originally dedicated to the public domain under CC0-1.0.
