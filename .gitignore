@@ -15,3 +15,5 @@
 # Maven
 target/
 log/
+pom.xml.versionsBackup
+**/pom.xml.versionsBackup
