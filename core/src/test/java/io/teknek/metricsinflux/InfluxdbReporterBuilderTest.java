@@ -71,6 +71,20 @@ public class InfluxdbReporterBuilderTest {
 	}
 
 	@Test
+	public void http_protocol_with_ca_certificate_preserves_configuration() {
+		HttpInfluxdbProtocol protocol = new HttpInfluxdbProtocol("https", "influxdb", 8181, "user", "token", "recommend")
+				.withCaCertificate("/tls/ca.crt");
+
+		assertThat(protocol.scheme, is("https"));
+		assertThat(protocol.host, is("influxdb"));
+		assertThat(protocol.port, is(8181));
+		assertThat(protocol.user, is("user"));
+		assertThat(protocol.password, is("token"));
+		assertThat(protocol.database, is("recommend"));
+		assertThat(protocol.caCertificatePath, is("/tls/ca.crt"));
+	}
+
+	@Test
 	public void builder_api_with_tranformer() {
 		MetricMeasurementTransformer mmt = new MetricMeasurementTransformer() {
 			@Override

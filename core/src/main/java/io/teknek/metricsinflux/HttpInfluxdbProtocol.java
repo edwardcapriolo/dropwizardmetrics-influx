@@ -16,8 +16,14 @@ public class HttpInfluxdbProtocol implements InfluxdbProtocol {
 	public final String database;
 	public final long connectTimeout;
 	public final long readTimeout;
+    public final String caCertificatePath;
 
 	public HttpInfluxdbProtocol(String scheme, String host, int port, String user, String password, String db, long connectTimeout, long readTimeout) {
+		this(scheme, host, port, user, password, db, connectTimeout, readTimeout, null);
+	}
+
+	public HttpInfluxdbProtocol(String scheme, String host, int port, String user, String password, String db,
+			long connectTimeout, long readTimeout, String caCertificatePath) {
 		super();
 		this.scheme = scheme;
 		this.host = host;
@@ -28,6 +34,7 @@ public class HttpInfluxdbProtocol implements InfluxdbProtocol {
 		this.secured = (user != null) && (password != null);
 		this.connectTimeout = connectTimeout;
 		this.readTimeout = readTimeout;
+		this.caCertificatePath = caCertificatePath;
 	}
 	
 	public HttpInfluxdbProtocol(String scheme, String host, int port, String user, String password, String db) {
@@ -56,5 +63,10 @@ public class HttpInfluxdbProtocol implements InfluxdbProtocol {
 
 	public HttpInfluxdbProtocol(String host, int port, String user, String password) {
 		this(host, port, user, password, DEFAULT_DATABASE);
+	}
+
+	public HttpInfluxdbProtocol withCaCertificate(String caCertificatePath) {
+		return new HttpInfluxdbProtocol(scheme, host, port, user, password, database, connectTimeout, readTimeout,
+				caCertificatePath);
 	}
 }

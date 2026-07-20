@@ -1,13 +1,23 @@
 package io.teknek.metricsinflux.measurements;
 
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +33,7 @@ public class HttpInlinerSender extends QueueableSender {
 	private final Inliner inliner;
 	private final long connectTimeout;
 	private final long readTimeout;
+	private final SSLContext sslContext;
 
 	public HttpInlinerSender(HttpInfluxdbProtocol protocol) {
 		super(MAX_MEASURES_IN_SINGLE_POST);
@@ -31,6 +42,7 @@ public class HttpInlinerSender extends QueueableSender {
 		inliner = new Inliner(TimeUnit.MILLISECONDS);
 		connectTimeout =  protocol.connectTimeout;
 		readTimeout = protocol.readTimeout;
+		sslContext = buildSslContext(protocol.caCertificatePath);
 
 		try {
 			if (protocol.secured) {
@@ -55,6 +67,9 @@ public class HttpInlinerSender extends QueueableSender {
 		HttpURLConnection con = null;
 		try {
 			con = (HttpURLConnection) writeURL.openConnection();
+			if (sslContext != null && con instanceof HttpsURLConnection httpsConnection) {
+				httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+			}
 			con.setRequestMethod("POST");
 			con.setConnectTimeout(Long.valueOf(TimeUnit.SECONDS.toMillis(connectTimeout)).intValue());
 			con.setReadTimeout(Long.valueOf(TimeUnit.SECONDS.toMillis(readTimeout)).intValue());
@@ -103,5 +118,25 @@ public class HttpInlinerSender extends QueueableSender {
 		}
 
 		return false;
+	}
+
+	private SSLContext buildSslContext(String caCertificatePath) {
+		if (caCertificatePath == null || caCertificatePath.isBlank()) {
+			return null;
+		}
+		try (InputStream inputStream = new FileInputStream(caCertificatePath)) {
+			CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+			Certificate certificate = certificateFactory.generateCertificate(inputStream);
+			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			trustStore.load(null, null);
+			trustStore.setCertificateEntry("ca", certificate);
+			TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			trustManagerFactory.init(trustStore);
+			SSLContext context = SSLContext.getInstance("TLS");
+			context.init(null, trustManagerFactory.getTrustManagers(), null);
+			return context;
+		} catch (IOException | GeneralSecurityException e) {
+			throw new IllegalArgumentException("Could not create SSL context from CA certificate " + caCertificatePath, e);
+		}
 	}
 }
