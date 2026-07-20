@@ -18,7 +18,7 @@ import io.teknek.metricsinflux.InfluxdbReporter.Builder;
 import io.teknek.metricsinflux.api.measurements.MetricMeasurementTransformer;
 
 public class InfluxdbReporterBuilderTest {
-	private MetricRegistry registry = new MetricRegistry();
+	private final MetricRegistry registry = new MetricRegistry();
 
 	@Test
 	public void builder_api_with_default_values() {

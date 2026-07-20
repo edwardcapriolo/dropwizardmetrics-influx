@@ -6,10 +6,11 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class Miscellaneous {
-	public static Charset UTF8 = Charset.forName("UTF-8");
+	public static Charset UTF8 = StandardCharsets.UTF_8;
 
 	public static String escape(String name, char... toEscape) {
 		String result = name;
@@ -22,12 +23,12 @@ public class Miscellaneous {
 	}
 
 	public static String urlEncode(String s) throws UnsupportedEncodingException {
-		return URLEncoder.encode(s, UTF8.name());
+		return URLEncoder.encode(s, UTF8);
 	}
 
 	public static String readFrom(InputStream is) throws IOException {
 		try (InputStreamReader isr = new InputStreamReader(is, UTF8)) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			char[] buffer = new char[2048];
 
 			int read;

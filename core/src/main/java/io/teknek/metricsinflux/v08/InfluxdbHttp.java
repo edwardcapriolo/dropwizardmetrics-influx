@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,19 +43,16 @@ import java.util.concurrent.TimeUnit;
  * </pre>
  */
 public class InfluxdbHttp implements Influxdb {
-	private static final Charset UTF_8 = Charset.forName("UTF-8");
+	private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
 	public static String toTimePrecision(TimeUnit t) {
-		switch (t) {
-		case SECONDS:
-			return "s";
-		case MILLISECONDS:
-			return "ms";
-		case MICROSECONDS:
-			return "u";
-		default:
-			throw new IllegalArgumentException("time precision should be SECONDS or MILLISECONDS or MICROSECONDS");
-		}
+        return switch (t) {
+            case SECONDS -> "s";
+            case MILLISECONDS -> "ms";
+            case MICROSECONDS -> "u";
+            default ->
+                    throw new IllegalArgumentException("time precision should be SECONDS or MILLISECONDS or MICROSECONDS");
+        };
 	}
 
 	public final URL url;

@@ -7,9 +7,9 @@ import io.teknek.metricsinflux.measurements.Measure;
 import io.teknek.metricsinflux.misc.Miscellaneous;
 
 public class Inliner {
-		private static char[] ESCAPE_CHARS = {' ', ',', '='};
+		private static final char[] ESCAPE_CHARS = {' ', ',', '='};
 
-		private TimeUnit precision;
+		private final TimeUnit precision;
 
 		public Inliner(TimeUnit precision) {
 			this.precision = precision;

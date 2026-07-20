@@ -1,15 +1,4 @@
-//	metrics-influxdb
-//
-//	Written in 2014 by David Bernard <dbernard@novaquark.com>
-//
-//	[other author/contributor lines as appropriate]
-//
-//	To the extent possible under law, the author(s) have dedicated all copyright and
-//	related and neighboring rights to this software to the public domain worldwide.
-//	This software is distributed without any warranty.
-//
-//	You should have received a copy of the CC0 Public Domain Dedication along with
-//	this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
+
 package io.teknek.metricsinflux;
 
 import java.util.HashMap;
@@ -44,7 +33,7 @@ import io.teknek.metricsinflux.v08.ReporterV08;
  */
 public class InfluxdbReporter  {
 
-	static enum InfluxdbCompatibilityVersions {
+	enum InfluxdbCompatibilityVersions {
 		V08, LATEST;
 	}
 
@@ -92,7 +81,7 @@ public class InfluxdbReporter  {
 			this.protocol = new HttpInfluxdbProtocol();
 			this.influxdbVersion = InfluxdbCompatibilityVersions.LATEST;
 			this.tags = new HashMap<>();
-			this.autoCreateDB=true;
+			this.autoCreateDB = true;
 		}
 
 		/**
@@ -248,19 +237,17 @@ public class InfluxdbReporter  {
 		}
 
 		private Influxdb buildInfluxdb() {
-			if (protocol instanceof HttpInfluxdbProtocol) {
+			if (protocol instanceof HttpInfluxdbProtocol p) {
 				try {
-					HttpInfluxdbProtocol p = (HttpInfluxdbProtocol) protocol;
-					return new InfluxdbHttp(p.scheme, p.host, p.port, p.database, p.user, p.password, durationUnit);
+                    return new InfluxdbHttp(p.scheme, p.host, p.port, p.database, p.user, p.password, durationUnit);
 				} catch(RuntimeException exc) {
 					throw exc;
 				} catch(Exception exc) {
 					// wrap exception into RuntimeException
 					throw new RuntimeException(exc.getMessage(), exc);
 				}
-			} else if (protocol instanceof UdpInfluxdbProtocol) {
-				UdpInfluxdbProtocol p = (UdpInfluxdbProtocol) protocol;
-				return new InfluxdbUdp(p.host, p.port);
+			} else if (protocol instanceof UdpInfluxdbProtocol p) {
+                return new InfluxdbUdp(p.host, p.port);
 			} else {
 				throw new IllegalStateException("unsupported protocol: " + protocol);
 			}
