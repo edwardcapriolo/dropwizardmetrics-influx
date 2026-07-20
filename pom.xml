@@ -29,7 +29,7 @@
 	<name>Dropwizard Metrics Influx Parent</name>
 	<groupId>io.teknek.metricsinflux</groupId>
 	<artifactId>dropwizardmetrics-influx-parent</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
