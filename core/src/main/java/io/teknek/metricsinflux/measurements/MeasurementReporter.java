@@ -48,9 +48,8 @@ public class MeasurementReporter extends ScheduledReporter{
 		this.transformer = transformer;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void report(SortedMap<MetricName, Gauge> gauges
+	public void report(SortedMap<MetricName, Gauge<?>> gauges
 			, SortedMap<MetricName, Counter> counters
 			, SortedMap<MetricName, Histogram> histograms
 			, SortedMap<MetricName, Meter> meters
@@ -58,7 +57,7 @@ public class MeasurementReporter extends ScheduledReporter{
 
 		final long timestamp = clock.getTime();
 
-		for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+		for (Map.Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
 			if (!isValidMetricName(entry.getKey())) {
 				continue;
 			}

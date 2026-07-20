@@ -190,8 +190,7 @@ public class ReporterV08 extends ScheduledReporter {
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
-	public void report(SortedMap<MetricName, Gauge> gauges,
+	public void report(SortedMap<MetricName, Gauge<?>> gauges,
 			SortedMap<MetricName, Counter> counters,
 			SortedMap<MetricName, Histogram> histograms,
 			SortedMap<MetricName, Meter> meters,
@@ -202,7 +201,7 @@ public class ReporterV08 extends ScheduledReporter {
 		try {
 			influxdb.resetRequest();
 
-			for (Map.Entry<MetricName, Gauge> entry : gauges.entrySet()) {
+			for (Map.Entry<MetricName, Gauge<?>> entry : gauges.entrySet()) {
 				reportGauge(entry.getKey().getKey(), entry.getValue(), timestamp);
 			}
 

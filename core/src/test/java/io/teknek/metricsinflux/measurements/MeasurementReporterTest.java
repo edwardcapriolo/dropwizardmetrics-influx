@@ -28,7 +28,6 @@ public class MeasurementReporterTest {
 		reporter = new MeasurementReporter(sender, registry, null, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, Clock.defaultClock(), Collections.<String, String>emptyMap(), MetricMeasurementTransformer.NOOP);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void reportingOneCounterGeneratesOneLine() {
 		assertThat(sender.getFrames().size(), is(0));
@@ -37,35 +36,32 @@ public class MeasurementReporterTest {
 		String counterName = "c";
 		Counter c = registry.counter(counterName);
 		c.inc();
-		reporter.report(SortedMaps.<MetricName, Gauge>empty(), singleton(MetricName.build(counterName), c), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
+		reporter.report(SortedMaps.<MetricName, Gauge<?>>empty(), singleton(MetricName.build(counterName), c), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
 		assertThat(sender.getFrames().size(), is(1));
 		assertThat(sender.getFrames().get(0), startsWith(counterName));
 		assertThat(sender.getFrames().get(0), containsString("count=1i"));
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void reportingInvalidMetricNameDiscardsMetric() {
 		Counter counter = new Counter();
 		counter.inc();
 
-		reporter.report(SortedMaps.<MetricName, Gauge>empty(), singleton(MetricName.build("bad metric"), counter), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
+		reporter.report(SortedMaps.<MetricName, Gauge<?>>empty(), singleton(MetricName.build("bad metric"), counter), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
 
 		assertThat(sender.getFrames().size(), is(0));
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void reportingTaggedMetricNameDiscardsMetric() {
 		Counter counter = new Counter();
 		counter.inc();
 
-		reporter.report(SortedMaps.<MetricName, Gauge>empty(), singleton(MetricName.build("counter").tagged("tag", "value"), counter), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
+		reporter.report(SortedMaps.<MetricName, Gauge<?>>empty(), singleton(MetricName.build("counter").tagged("tag", "value"), counter), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
 
 		assertThat(sender.getFrames().size(), is(0));
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void reportingOneGaugeGeneratesOneLine() {
 		assertThat(sender.getFrames().size(), is(0));
@@ -79,13 +75,12 @@ public class MeasurementReporterTest {
 			}
 		};
 
-		reporter.report(SortedMaps.<MetricName, Gauge>singleton(MetricName.build(gaugeName), g), SortedMaps.<MetricName, Counter>empty(), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
+		reporter.report(SortedMaps.<MetricName, Gauge<?>>singleton(MetricName.build(gaugeName), g), SortedMaps.<MetricName, Counter>empty(), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
 		assertThat(sender.getFrames().size(), is(1));
 		assertThat(sender.getFrames().get(0), startsWith(gaugeName));
 		assertThat(sender.getFrames().get(0), containsString("value=0i"));
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void reportingOneMeterGeneratesOneLine() {
 		assertThat(sender.getFrames().size(), is(0));
@@ -94,7 +89,7 @@ public class MeasurementReporterTest {
 		String meterName = "m";
 		Meter meter = registry.meter(meterName);
 		meter.mark();
-		reporter.report(SortedMaps.<MetricName, Gauge>empty(), SortedMaps.<MetricName, Counter>empty(), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.singleton(MetricName.build(meterName), meter), SortedMaps.<MetricName, Timer>empty());
+		reporter.report(SortedMaps.<MetricName, Gauge<?>>empty(), SortedMaps.<MetricName, Counter>empty(), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.singleton(MetricName.build(meterName), meter), SortedMaps.<MetricName, Timer>empty());
 
 		assertThat(sender.getFrames().size(), is(1));
 		assertThat(sender.getFrames().get(0), startsWith(meterName));
@@ -106,7 +101,6 @@ public class MeasurementReporterTest {
 		assertThat(sender.getFrames().get(0), containsString("mean-minute="));
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void reportingOneHistogramGeneratesOneLine() {
 		assertThat(sender.getFrames().size(), is(0));
@@ -115,7 +109,7 @@ public class MeasurementReporterTest {
 		String histogramName = "h";
 		Histogram histogram = registry.histogram(histogramName);
 		histogram.update(0);
-		reporter.report(SortedMaps.<MetricName, Gauge>empty(), SortedMaps.<MetricName, Counter>empty(), SortedMaps.singleton(MetricName.build(histogramName), histogram), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
+		reporter.report(SortedMaps.<MetricName, Gauge<?>>empty(), SortedMaps.<MetricName, Counter>empty(), SortedMaps.singleton(MetricName.build(histogramName), histogram), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
 
 		assertThat(sender.getFrames().size(), is(1));
 		assertThat(sender.getFrames().get(0), startsWith(histogramName));
@@ -133,7 +127,6 @@ public class MeasurementReporterTest {
 		assertThat(sender.getFrames().get(0), containsString("run-count="));
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void reportingOneTimerGeneratesOneLine() {
 		assertThat(sender.getFrames().size(), is(0));
@@ -150,7 +143,7 @@ public class MeasurementReporterTest {
 
 		ctx.stop();
 
-		reporter.report(SortedMaps.<MetricName, Gauge>empty(), SortedMaps.<MetricName, Counter>empty(), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.singleton(MetricName.build(timerName), meter));
+		reporter.report(SortedMaps.<MetricName, Gauge<?>>empty(), SortedMaps.<MetricName, Counter>empty(), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.singleton(MetricName.build(timerName), meter));
 
 
 		assertThat(sender.getFrames().size(), is(1));

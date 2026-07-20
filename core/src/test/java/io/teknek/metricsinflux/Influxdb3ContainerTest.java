@@ -11,11 +11,9 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -50,7 +48,7 @@ public class Influxdb3ContainerTest {
             reporter.report();
 
             String query = query(baseUrl, "recommend", "SELECT * FROM \"smoke.counter\" WHERE time > now() - INTERVAL '10 minutes'");
-            assertTrue(query.contains("smoke.counter"), query);
+            assertTrue(query.contains("\"count\":1"), query);
         }
     }
 
@@ -67,10 +65,11 @@ public class Influxdb3ContainerTest {
     }
 
     private String query(String baseUrl, String database, String sql) throws IOException, InterruptedException {
-        String body = "db=" + URLEncoder.encode(database, StandardCharsets.UTF_8)
-                + "&q=" + URLEncoder.encode(sql, StandardCharsets.UTF_8);
+        String body = "{\"db\":\"" + jsonEscape(database) + "\",\"format\":\"json\",\"params\":{},\"q\":\""
+                + jsonEscape(sql) + "\"}";
         HttpRequest request = HttpRequest.newBuilder(URI.create(baseUrl + "/api/v3/query_sql"))
-                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
@@ -78,5 +77,9 @@ public class Influxdb3ContainerTest {
             throw new AssertionError("Could not query database: status=" + response.statusCode() + " body=" + response.body());
         }
         return response.body();
+    }
+
+    private String jsonEscape(String value) {
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }

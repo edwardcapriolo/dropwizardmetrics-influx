@@ -19,7 +19,6 @@ public class MeasurementReporterWithBaseTagsTest {
 	private ListInlinerSender sender = new ListInlinerSender(100);
 	private MetricRegistry registry = new MetricRegistry();
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void generatedMeasurementContainsBaseTags() {
 		String serverKey = "server";
@@ -34,7 +33,7 @@ public class MeasurementReporterWithBaseTagsTest {
 		String counterName = "c";
 		Counter c = registry.counter(counterName);
 		c.inc();
-		reporter.report(SortedMaps.<MetricName, Gauge>empty(), singleton(MetricName.build(counterName), c), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
+		reporter.report(SortedMaps.<MetricName, Gauge<?>>empty(), singleton(MetricName.build(counterName), c), SortedMaps.<MetricName, Histogram>empty(), SortedMaps.<MetricName, Meter>empty(), SortedMaps.<MetricName, Timer>empty());
 		assertThat(sender.getFrames().size(), is(1));
 		assertThat(sender.getFrames().get(0), startsWith(counterName));
 		assertThat(sender.getFrames().get(0), containsString("count=1i"));

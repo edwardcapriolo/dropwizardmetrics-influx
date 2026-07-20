@@ -7,7 +7,7 @@
 		<java.version>17</java.version>
 
 		<!-- dependency versions -->
-		<metrics.version>5.0.0</metrics.version>
+		<metrics.version>5.0.7</metrics.version>
 		<junit.jupiter.version>5.14.1</junit.jupiter.version>
 		<hamcrest.version>1.3</hamcrest.version>
 		<guava.version>33.5.0-jre</guava.version>
